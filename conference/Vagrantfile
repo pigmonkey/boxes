@@ -10,4 +10,11 @@ Vagrant.configure(2) do |config|
     vb.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
     vb.customize ['modifyvm', :id, '--vram', '128']
   end
+  # Set the timezone to the host timezone
+  require 'time'
+  offset = -((Time.zone_offset(Time.now.zone)/60)/60)
+  zonesufix = offset >= 0 ? "+#{offset}" : "#{offset}"
+  timezone = 'Etc/GMT' + zonesufix
+  config.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/" + timezone + " /etc/localtime", run: "always"
+  config.vm.provision :shell, :inline => "dpkg-reconfigure --frontend noninteractive tzdata", run: "always"
 end
