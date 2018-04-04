@@ -19,4 +19,5 @@ apt-get install -y google-chrome-stable
 apt-get upgrade
 
 # DKMS
+apt-get install -y virtualbox-guest-dkms
 dpkg-reconfigure virtualbox-guest-dkms
