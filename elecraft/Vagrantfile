@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.provision :shell, :path => "bootstrap.sh"
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+    vb.customize ["modifyvm", :id, "--usb", "on"]
+    vb.customize ['usbfilter', 'add', '0', '--target', :id, '--name', 'ESP', '--vendorid', '0x0403', '--productid', '0x6001']
+  end
+  # Set the timezone to the host timezone
+  require 'time'
+  offset = -((Time.zone_offset(Time.now.zone)/60)/60)
+  zonesufix = offset >= 0 ? "+#{offset}" : "#{offset}"
+  timezone = 'Etc/GMT' + zonesufix
+  config.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/" + timezone + " /etc/localtime", run: "always"
+  config.vm.provision :shell, :inline => "dpkg-reconfigure --frontend noninteractive tzdata", run: "always"
+end
